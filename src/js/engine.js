@@ -1049,12 +1049,24 @@ function DoUndo(force,ignoreDuplicates) {
 	}
 }
 
-function getPlayerPositions() {
+function getPlayer1Positions() {
     var result=[];
-    var playerMask = state.playerMask;
+    var player1Mask = state.player1Mask;
     for (var i=0;i<level.n_tiles;i++) {
         level.getCellInto(i,_o11);
-        if (playerMask.anyBitsInCommon(_o11)) {
+        if (player1Mask.anyBitsInCommon(_o11)) {
+            result.push(i);
+        }
+    }
+    return result;
+}
+
+function getPlayer2Positions() {
+    var result=[];
+    var player2Mask = state.player2Mask;
+    for (var i=0;i<level.n_tiles;i++) {
+        level.getCellInto(i,_o11);
+        if (player2Mask.anyBitsInCommon(_o11)) {
             result.push(i);
         }
     }
@@ -1092,13 +1104,22 @@ function moveEntitiesAtIndex(positionIndex, entityMask, dirMask) {
 }
 
 
-function startMovement(dir) {
+function startMovement(dir, player1) {
 	var movedany=false;
-    var playerPositions = getPlayerPositions();
-    for (var i=0;i<playerPositions.length;i++) {
-        var playerPosIndex = playerPositions[i];
-        moveEntitiesAtIndex(playerPosIndex,state.playerMask,dir);
-    }
+	var playerPositions = null;
+	if (player1) {
+	    playerPositions = getPlayer1Positions();
+	    for (var i=0;i<playerPositions.length;i++) {
+	        var playerPosIndex = playerPositions[i];
+	        moveEntitiesAtIndex(playerPosIndex,state.player1Mask,dir);
+	    }
+	} else {
+	    playerPositions = getPlayer2Positions();
+	    for (var i=0;i<playerPositions.length;i++) {
+	        var playerPosIndex = playerPositions[i];
+	        moveEntitiesAtIndex(playerPosIndex,state.player2Mask,dir);
+	    }
+	}
     return playerPositions;
 }
 
@@ -2461,7 +2482,7 @@ function processInput(dir,dontDoWin,dontModify) {
 	var inputindex=dir;
 
 	var playerPositions=[];
-    if (dir<=4) {//when is dir>4???
+    if (dir<=9) {//when is dir>4???
 
 
 		if (verbose_logging) { 
@@ -2471,34 +2492,40 @@ function processInput(dir,dontDoWin,dontModify) {
 
 
     	if (dir>=0) {
+    		var dirmask = null;
 	        switch(dir){
 	            case 0://up
+	            case 5://up
 	            {
-	                dir=parseInt('00001', 2);;
+	                dirmask=parseInt('00001', 2);;
 	                break;
 	            }
 	            case 1://left
+	            case 6://left
 	            {
-	                dir=parseInt('00100', 2);;
+	                dirmask=parseInt('00100', 2);;
 	                break;
 	            }
 	            case 2://down
+	            case 7://left
 	            {
-	                dir=parseInt('00010', 2);;
+	                dirmask=parseInt('00010', 2);;
 	                break;
 	            }
 	            case 3://right
+	            case 8://left
 	            {
-	                dir=parseInt('01000', 2);;
+	                dirmask=parseInt('01000', 2);;
 	                break;
 	            }
 	            case 4://action
+	            case 9://left
 	            {
-	                dir=parseInt('10000', 2);;
+	                dirmask=parseInt('10000', 2);;
 	                break;
 	            }
 	        }
-	        playerPositions = startMovement(dir);
+	        playerPositions = startMovement(dirmask, dir < 5);
 		}
 			
 		

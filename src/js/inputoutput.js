@@ -592,6 +592,46 @@ function checkKey(e,justPressed) {
             inputdir=2;
         break;
         }
+        case 74://j
+        {
+//            window.console.log("LEFT");
+            inputdir=6;
+        break;
+        }
+        case 73: //i
+        {
+//            window.console.log("UP");
+            inputdir=5;
+        break;
+        }
+        case 76://l
+        {
+//            window.console.log("RIGHT");
+            inputdir=8;
+        break;
+        }
+        case 75://k
+        {
+//            window.console.log("DOWN");
+            inputdir=7;
+        break;
+        }
+        case 77://m
+        {
+//            window.console.log("ACTION");
+			if (justPressed && ignoreNotJustPressedAction){
+				ignoreNotJustPressedAction=false;
+			}
+			if (justPressed===false && ignoreNotJustPressedAction){
+				return;
+			}
+			if (norepeat_action===false || justPressed) {
+            	inputdir=9;
+            } else {
+            	return;
+            }
+        break;
+        }
         case 80://p
         {
 			printLevel();
@@ -722,7 +762,7 @@ function checkKey(e,justPressed) {
         	break;	
 		}
     }
-    if (throttle_movement && inputdir>=0&&inputdir<=3) {
+    if (throttle_movement && ((inputdir>=0&&inputdir<=3) || (inputdir >= 5 && inputdir <= 8))) {
     	if (lastinput==inputdir && input_throttle_timer<repeatinterval) {
     		return;
     	} else {
@@ -758,7 +798,7 @@ function checkKey(e,justPressed) {
 	    				redraw();
 	    			}
     			}
-    			else if (inputdir===0||inputdir===2) {
+    			else if (inputdir===0||inputdir===2||inputdir===5||inputdir===7) {
     				if (inputdir===0){
     					titleSelection=0;    					
     				} else {
@@ -769,7 +809,7 @@ function checkKey(e,justPressed) {
     			}
     		}
     	} else {
-    		if (inputdir==4&&justPressed) {    				
+    		if ((inputdir==4 || inputdir==9)&&justPressed) {    				
 				if (unitTesting) {
 					nextLevel();
 					return;
@@ -785,7 +825,7 @@ function checkKey(e,justPressed) {
     	}
     } else {
 	    if (!againing && inputdir>=0) {
-            if (inputdir===4 && ('noaction' in state.metadata)) {
+            if ((inputdir===4 || inputdir===9) && ('noaction' in state.metadata)) {
 
             } else {
                 pushInput(inputdir);
