@@ -1,5 +1,5 @@
-title Simple Block Pushing Game
-author David Skinner
+title 2 Player Sokoban
+author Joseph Mansfield
 homepage www.puzzlescript.net
 
 ========
@@ -30,8 +30,16 @@ brown darkbrown
 11111
 00010
 
-Player
+Player1
 black orange white blue
+.000.
+.111.
+22222
+.333.
+.3.3.
+
+Player2
+white brown red pink
 .000.
 .111.
 22222
@@ -52,10 +60,14 @@ LEGEND
 
 . = Background
 # = Wall
-P = Player
+P = Player1
+Q = Player2
 * = Crate
 @ = Crate and Target
 O = Target
+
+Player = Player1 or Player2
+Pushable = Crate or Player
 
 =======
 SOUNDS
@@ -69,13 +81,13 @@ COLLISIONLAYERS
 
 Background
 Target
-Player, Wall, Crate
+Player1, Player2, Wall, Crate
 
 ======
 RULES
 ======
 
-[ > Player | Crate ] -> [ > Player | > Crate ] 
+[ > Pushable | Pushable ] -> [ > Pushable | > Pushable ] 
 
 ==============
 WINCONDITIONS
@@ -87,18 +99,11 @@ all Target on Crate
 LEVELS
 =======
 
-####..
-#.O#..
-#..###
-#@P..#
-#..*.#
-#..###
-####..
+#########
+#......O#
+#.P...Q.#
+#.......#
+#...*...#
+#.......#
+#########
 
-######
-#....#
-#.#P.#
-#.*@.#
-#.O@.#
-#....#
-######

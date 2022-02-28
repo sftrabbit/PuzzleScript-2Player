@@ -2071,13 +2071,14 @@ function getMaskFromName(state, name) {
     }
 
     if (objectMask.iszero()) {
-        logErrorNoLine("error, didn't find any object called player, either in the objects section, or the legends section. there must be a player!");
+        logErrorNoLine("error, didn't find any object called " + name + ", either in the objects section, or the legends section. there must be a " + name + "!");
     }
     return objectMask;
 }
 
 function generateMasks(state) {
-    state.playerMask = getMaskFromName(state, 'player');
+    state.player1Mask = getMaskFromName(state, 'player1');
+    state.player2Mask = getMaskFromName(state, 'player2');
 
     var layerMasks = [];
     var layerCount = state.collisionLayers.length;
