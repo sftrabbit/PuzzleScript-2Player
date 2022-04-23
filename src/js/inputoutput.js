@@ -565,13 +565,11 @@ function checkKey(e,justPressed) {
     var inputdir=-1;
     switch(e.keyCode) {
         case 65://a
-        case 37: //left
         {
 //            window.console.log("LEFT");
             inputdir=1;
         break;
         }
-        case 38: //up
         case 87: //w
         {
 //            window.console.log("UP");
@@ -579,38 +577,36 @@ function checkKey(e,justPressed) {
         break;
         }
         case 68://d
-        case 39: //right
         {
 //            window.console.log("RIGHT");
             inputdir=3;
         break;
         }
         case 83://s
-        case 40: //down
         {
 //            window.console.log("DOWN");
             inputdir=2;
         break;
         }
-        case 74://j
+        case 37: //left
         {
 //            window.console.log("LEFT");
             inputdir=6;
         break;
         }
-        case 73: //i
+        case 38: //up
         {
 //            window.console.log("UP");
             inputdir=5;
         break;
         }
-        case 76://l
+        case 39: //right
         {
 //            window.console.log("RIGHT");
             inputdir=8;
         break;
         }
-        case 75://k
+        case 40: //down
         {
 //            window.console.log("DOWN");
             inputdir=7;
