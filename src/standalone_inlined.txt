@@ -4637,6 +4637,58 @@ var font = {
 00000
 00000
 00000`,
+	'↑':`
+00000
+00000
+00000
+00100
+01110
+11111
+00100
+00100
+00100
+00100
+00000
+00000`,
+	'←':`
+00000
+00000
+00000
+00000
+00100
+01100
+11111
+01100
+00100
+00000
+00000
+00000`,
+	'↓':`
+00000
+00000
+00000
+00100
+00100
+00100
+00100
+11111
+01110
+00100
+00000
+00000`,
+	'→':`
+00000
+00000
+00000
+00000
+00100
+00110
+11111
+00110
+00100
+00000
+00000
+00000`,
 }
 
 </script>
@@ -7223,10 +7275,10 @@ var titletemplate_firstgo = [
 	"..........#.start game.#..........",
 	"..................................",
 	"..................................",
-	".arrow keys to move...............",
-	".X to action......................",
-	".Z to undo, R to restart..........",
-	".................................."];
+	".Player 1................Player 2.",
+	".WASD to move........↑←↓→ to move.",
+	".X to action..........M to action.",
+	".....Z to undo, R to restart......"];
 
 var titletemplate_select0 = [
 	"..................................",
@@ -7238,10 +7290,10 @@ var titletemplate_select0 = [
 	"..................................",
 	".............continue.............",
 	"..................................",
-	".arrow keys to move...............",
-	".X to action......................",
-	".Z to undo, R to restart..........",
-	".................................."];
+	".Player 1................Player 2.",
+	".WASD to move........↑←↓→ to move.",
+	".X to action..........M to action.",
+	".....Z to undo, R to restart......"];
 
 var titletemplate_select1 = [
 	"..................................",
@@ -7253,10 +7305,10 @@ var titletemplate_select1 = [
 	"..................................",
 	"...........#.continue.#...........",
 	"..................................",
-	".arrow keys to move...............",
-	".X to action......................",
-	".Z to undo, R to restart..........",
-	".................................."];
+	".Player 1................Player 2.",
+	".WASD to move........↑←↓→ to move.",
+	".X to action..........M to action.",
+	".....Z to undo, R to restart......"];
 
 
 var titletemplate_firstgo_selected = [
@@ -7269,10 +7321,10 @@ var titletemplate_firstgo_selected = [
 	"###########.start game.###########",
 	"..................................",
 	"..................................",
-	".arrow keys to move...............",
-	".X to action......................",
-	".Z to undo, R to restart..........",
-	".................................."];
+	".Player 1................Player 2.",
+	".WASD to move........↑←↓→ to move.",
+	".X to action..........M to action.",
+	".....Z to undo, R to restart......"];
 
 var titletemplate_select0_selected = [
 	"..................................",
@@ -7284,10 +7336,10 @@ var titletemplate_select0_selected = [
 	"..................................",
 	".............continue.............",
 	"..................................",
-	".arrow keys to move...............",
-	".X to action......................",
-	".Z to undo, R to restart..........",
-	".................................."];
+	".Player 1................Player 2.",
+	".WASD to move........↑←↓→ to move.",
+	".X to action..........M to action.",
+	".....Z to undo, R to restart......"];
 
 var titletemplate_select1_selected = [
 	"..................................",
@@ -7299,10 +7351,10 @@ var titletemplate_select1_selected = [
 	"..................................",
 	"############.continue.############",
 	"..................................",
-	".arrow keys to move...............",
-	".X to action......................",
-	".Z to undo, R to restart..........",
-	"................................."];
+	".Player 1................Player 2.",
+	".WASD to move........↑←↓→ to move.",
+	".X to action..........M to action.",
+	".....Z to undo, R to restart......"];
 
 var titleImage=[];
 var titleWidth=titletemplate_select1[0].length;
@@ -8216,12 +8268,24 @@ function DoUndo(force,ignoreDuplicates) {
 	}
 }
 
-function getPlayerPositions() {
+function getPlayer1Positions() {
     var result=[];
-    var playerMask = state.playerMask;
+    var player1Mask = state.player1Mask;
     for (var i=0;i<level.n_tiles;i++) {
         level.getCellInto(i,_o11);
-        if (playerMask.anyBitsInCommon(_o11)) {
+        if (player1Mask.anyBitsInCommon(_o11)) {
+            result.push(i);
+        }
+    }
+    return result;
+}
+
+function getPlayer2Positions() {
+    var result=[];
+    var player2Mask = state.player2Mask;
+    for (var i=0;i<level.n_tiles;i++) {
+        level.getCellInto(i,_o11);
+        if (player2Mask.anyBitsInCommon(_o11)) {
             result.push(i);
         }
     }
@@ -8259,13 +8323,22 @@ function moveEntitiesAtIndex(positionIndex, entityMask, dirMask) {
 }
 
 
-function startMovement(dir) {
+function startMovement(dir, player1) {
 	var movedany=false;
-    var playerPositions = getPlayerPositions();
-    for (var i=0;i<playerPositions.length;i++) {
-        var playerPosIndex = playerPositions[i];
-        moveEntitiesAtIndex(playerPosIndex,state.playerMask,dir);
-    }
+	var playerPositions = null;
+	if (player1) {
+	    playerPositions = getPlayer1Positions();
+	    for (var i=0;i<playerPositions.length;i++) {
+	        var playerPosIndex = playerPositions[i];
+	        moveEntitiesAtIndex(playerPosIndex,state.player1Mask,dir);
+	    }
+	} else {
+	    playerPositions = getPlayer2Positions();
+	    for (var i=0;i<playerPositions.length;i++) {
+	        var playerPosIndex = playerPositions[i];
+	        moveEntitiesAtIndex(playerPosIndex,state.player2Mask,dir);
+	    }
+	}
     return playerPositions;
 }
 
@@ -9628,7 +9701,7 @@ function processInput(dir,dontDoWin,dontModify) {
 	var inputindex=dir;
 
 	var playerPositions=[];
-    if (dir<=4) {//when is dir>4???
+    if (dir<=9) {//when is dir>4???
 
 
 		if (verbose_logging) { 
@@ -9638,34 +9711,40 @@ function processInput(dir,dontDoWin,dontModify) {
 
 
     	if (dir>=0) {
+    		var dirmask = null;
 	        switch(dir){
 	            case 0://up
+	            case 5://up
 	            {
-	                dir=parseInt('00001', 2);;
+	                dirmask=parseInt('00001', 2);;
 	                break;
 	            }
 	            case 1://left
+	            case 6://left
 	            {
-	                dir=parseInt('00100', 2);;
+	                dirmask=parseInt('00100', 2);;
 	                break;
 	            }
 	            case 2://down
+	            case 7://left
 	            {
-	                dir=parseInt('00010', 2);;
+	                dirmask=parseInt('00010', 2);;
 	                break;
 	            }
 	            case 3://right
+	            case 8://left
 	            {
-	                dir=parseInt('01000', 2);;
+	                dirmask=parseInt('01000', 2);;
 	                break;
 	            }
 	            case 4://action
+	            case 9://left
 	            {
-	                dir=parseInt('10000', 2);;
+	                dirmask=parseInt('10000', 2);;
 	                break;
 	            }
 	        }
-	        playerPositions = startMovement(dir);
+	        playerPositions = startMovement(dirmask, dir < 5);
 		}
 			
 		
@@ -11551,6 +11630,7 @@ var codeMirrorFn = function() {
                                 return 'LOGICWORD';
                             }
                             else {
+                                logError('Expecting the start of a win condition ("ALL","SOME","NO") but got "'+candword.toUpperCase()+"'.", state.lineNumber);
                                 return 'ERROR';
                             }
                         }
@@ -13858,13 +13938,14 @@ function getMaskFromName(state, name) {
     }
 
     if (objectMask.iszero()) {
-        logErrorNoLine("error, didn't find any object called player, either in the objects section, or the legends section. there must be a player!");
+        logErrorNoLine("error, didn't find any object called " + name + ", either in the objects section, or the legends section. there must be a " + name + "!");
     }
     return objectMask;
 }
 
 function generateMasks(state) {
-    state.playerMask = getMaskFromName(state, 'player');
+    state.player1Mask = getMaskFromName(state, 'player1');
+    state.player2Mask = getMaskFromName(state, 'player2');
 
     var layerMasks = [];
     var layerCount = state.collisionLayers.length;
@@ -15222,13 +15303,11 @@ function checkKey(e,justPressed) {
     var inputdir=-1;
     switch(e.keyCode) {
         case 65://a
-        case 37: //left
         {
 //            window.console.log("LEFT");
             inputdir=1;
         break;
         }
-        case 38: //up
         case 87: //w
         {
 //            window.console.log("UP");
@@ -15236,17 +15315,55 @@ function checkKey(e,justPressed) {
         break;
         }
         case 68://d
-        case 39: //right
         {
 //            window.console.log("RIGHT");
             inputdir=3;
         break;
         }
         case 83://s
-        case 40: //down
         {
 //            window.console.log("DOWN");
             inputdir=2;
+        break;
+        }
+        case 37: //left
+        {
+//            window.console.log("LEFT");
+            inputdir=6;
+        break;
+        }
+        case 38: //up
+        {
+//            window.console.log("UP");
+            inputdir=5;
+        break;
+        }
+        case 39: //right
+        {
+//            window.console.log("RIGHT");
+            inputdir=8;
+        break;
+        }
+        case 40: //down
+        {
+//            window.console.log("DOWN");
+            inputdir=7;
+        break;
+        }
+        case 77://m
+        {
+//            window.console.log("ACTION");
+			if (justPressed && ignoreNotJustPressedAction){
+				ignoreNotJustPressedAction=false;
+			}
+			if (justPressed===false && ignoreNotJustPressedAction){
+				return;
+			}
+			if (norepeat_action===false || justPressed) {
+            	inputdir=9;
+            } else {
+            	return;
+            }
         break;
         }
         case 80://p
@@ -15379,7 +15496,7 @@ function checkKey(e,justPressed) {
         	break;	
 		}
     }
-    if (throttle_movement && inputdir>=0&&inputdir<=3) {
+    if (throttle_movement && ((inputdir>=0&&inputdir<=3) || (inputdir >= 5 && inputdir <= 8))) {
     	if (lastinput==inputdir && input_throttle_timer<repeatinterval) {
     		return;
     	} else {
@@ -15415,7 +15532,7 @@ function checkKey(e,justPressed) {
 	    				redraw();
 	    			}
     			}
-    			else if (inputdir===0||inputdir===2) {
+    			else if (inputdir===0||inputdir===2||inputdir===5||inputdir===7) {
     				if (inputdir===0){
     					titleSelection=0;    					
     				} else {
@@ -15426,7 +15543,7 @@ function checkKey(e,justPressed) {
     			}
     		}
     	} else {
-    		if (inputdir==4&&justPressed) {    				
+    		if ((inputdir==4 || inputdir==9)&&justPressed) {    				
 				if (unitTesting) {
 					nextLevel();
 					return;
@@ -15442,7 +15559,7 @@ function checkKey(e,justPressed) {
     	}
     } else {
 	    if (!againing && inputdir>=0) {
-            if (inputdir===4 && ('noaction' in state.metadata)) {
+            if ((inputdir===4 || inputdir===9) && ('noaction' in state.metadata)) {
 
             } else {
                 pushInput(inputdir);
