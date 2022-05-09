@@ -612,7 +612,7 @@ function checkKey(e,justPressed) {
             inputdir=7;
         break;
         }
-        case 77://m
+        case 191://forward slash
         {
 //            window.console.log("ACTION");
 			if (justPressed && ignoreNotJustPressedAction){
